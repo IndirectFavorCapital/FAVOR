@@ -1,5 +1,5 @@
-# BEP20 Favor Token
-BEP20 Favor Token contracts
+# BEP20 Favor
+BEP20 Favor contracts
 
 ## For Developers
 
