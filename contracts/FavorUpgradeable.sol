@@ -17,18 +17,18 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 contract FavorToken is is Initializable, ERC20Upgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable, ERC20BurnableUpgradeable, ERC20PermitUpgradeable, ERC20VotesUpgradeable, ERC20FlashMintUpgradeable {
     
     using SafeERC20Upgradeable for IERC20Upgradeable;
-	
-	function initialize() initializer public {
+
+    function initialize() initializer public {
         __ERC20_init("Favor", "FAVOR");
         __ERC20Burnable_init();
-		__ReentrancyGuard_init();
+        __ReentrancyGuard_init();
         __Pausable_init();
         __Ownable_init();
         __ERC20Permit_init("Favor");
         __ERC20FlashMint_init();
     }
-	
-	function pause() external onlyOwner {
+
+    function pause() external onlyOwner {
         _pause();
     }
 
@@ -43,12 +43,12 @@ contract FavorToken is is Initializable, ERC20Upgradeable, OwnableUpgradeable, R
     function burn(uint256 _amount) external {
         _burn(msg.sender, _amount);
     }
-	
-	function _beforeTokenTransfer(address from, address to, uint256 amount) internal whenNotPaused override {
+
+    function _beforeTokenTransfer(address from, address to, uint256 amount) internal whenNotPaused override {
         super._beforeTokenTransfer(from, to, amount);
     }
-	
-	function _afterTokenTransfer(address from, address to, uint256 amount) internal override(ERC20Upgradeable, ERC20VotesUpgradeable) {
+
+    function _afterTokenTransfer(address from, address to, uint256 amount) internal override(ERC20Upgradeable, ERC20VotesUpgradeable) {
         super._afterTokenTransfer(from, to, amount);
     }
 
@@ -59,6 +59,6 @@ contract FavorToken is is Initializable, ERC20Upgradeable, OwnableUpgradeable, R
     function _burn(address account, uint256 amount) internal override(ERC20Upgradeable, ERC20VotesUpgradeable) {
         super._burn(account, amount);
     }
-	
+
 }
 
