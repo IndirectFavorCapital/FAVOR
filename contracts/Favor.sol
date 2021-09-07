@@ -23,8 +23,8 @@ contract FavorToken is ERC20, Ownable, ReentrancyGuard, Pausable, ERC20Burnable,
         _cap = 100000000;
         _mint(msg.sender, _totalSupply);
     }
-	
-	function pause() external onlyOwner {
+
+    function pause() external onlyOwner {
         _pause();
     }
 
@@ -39,12 +39,12 @@ contract FavorToken is ERC20, Ownable, ReentrancyGuard, Pausable, ERC20Burnable,
     function burn(uint256 _amount) external {
         _burn(msg.sender, _amount);
     }
-	
-	function _beforeTokenTransfer(address from, address to, uint256 amount) internal whenNotPaused override {
+
+    function _beforeTokenTransfer(address from, address to, uint256 amount) internal whenNotPaused override {
         super._beforeTokenTransfer(from, to, amount);
     }
-	
-	function _afterTokenTransfer(address from, address to, uint256 amount) internal override(ERC20, ERC20Votes) {
+
+    function _afterTokenTransfer(address from, address to, uint256 amount) internal override(ERC20, ERC20Votes) {
         super._afterTokenTransfer(from, to, amount);
     }
 
@@ -55,5 +55,5 @@ contract FavorToken is ERC20, Ownable, ReentrancyGuard, Pausable, ERC20Burnable,
     function _burn(address account, uint256 amount) internal override(ERC20, ERC20Votes) {
         super._burn(account, amount);
     }
-	
+
 }
