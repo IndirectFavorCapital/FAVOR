@@ -16,7 +16,7 @@ contract FavorToken is ERC20, ERC20Capped, ERC20Burnable, ERC20Votes, Ownable, P
 
     using SafeERC20 for IERC20;
 
-    constructor(string memory _name, string memory _symbol, uint256 _totalSupply, uint256 _cap) ERC20(_name, _symbol) ERC20Capped(_cap){
+    constructor(string memory _name, string memory _symbol, uint256 _totalSupply, uint256 _cap) ERC20(_name, _symbol) ERC20Capped(_cap) {
         _mint(msg.sender, _totalSupply);
     }
 
