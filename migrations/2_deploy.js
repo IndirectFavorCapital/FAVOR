@@ -9,6 +9,7 @@ const FavorToken = artifacts.require("FavorToken");
 const FavorName = "Favor";
 const FavorSymbol = "FAVOR";
 const FavorSupply = ether("5000000"); // 5,000,000 tokens
+const FavorCap = ether("100000000");  // 100,000,000 tokens
 
 module.exports = async function (deployer, network, accounts) {
     if (network === "test") return; // skip migrations if use test network
@@ -17,7 +18,7 @@ module.exports = async function (deployer, network, accounts) {
     console.log("FavorToken deployment...");
 
     // deploy token
-    await deployer.deploy(FavorToken, FavorName, FavorSymbol, FavorSupply);
+    await deployer.deploy(FavorToken, FavorName, FavorSymbol, FavorSupply, FavorCap);
     let favorToken = await FavorToken.deployed();
     console.log("favorToken address: ", favorToken.address);
 
