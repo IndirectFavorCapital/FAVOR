@@ -2,25 +2,26 @@
 
 pragma solidity 0.8.6;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-
-contract FavorToken is ERC20, ERC20Capped, ERC20Burnable, ERC20Votes, Ownable, Pausable, ReentrancyGuard {
+contract FavorToken is ERC20Burnable, ERC20Votes, Ownable, Pausable, ReentrancyGuard {
 
     using SafeERC20 for IERC20;
+
+    uint256 private immutable _cap;
 
     /**
      * @dev Initializes the contract minting the new tokens for the deployer.
      * deployer here is the owner of the FavorToken.
      */
-    constructor(string memory _name, string memory _symbol, uint256 _totalSupply, uint256 _cap) ERC20(_name, _symbol) ERC20Capped(_cap) {
+    constructor(string memory _name, string memory _symbol, uint256 _totalSupply, uint256 cap_) ERC20(_name, _symbol) ERC20Permit(_name) {
+        require(_totalSupply <= cap_,"constructor: totalSupply cannot be more than cap");
+        _cap = cap_;
         _mint(msg.sender, _totalSupply);
     }
 
@@ -47,36 +48,20 @@ contract FavorToken is ERC20, ERC20Capped, ERC20Burnable, ERC20Votes, Ownable, P
      *
      * See {ERC20-_mint}.
      */
-    function mint(uint256 _amount) external onlyOwner {
-        _mint(msg.sender, _amount);
+    function mint(address to, uint256 amount) external onlyOwner {
+        _mint(to, amount);
     }
 
-    /**
-     * @dev Destroys `_amount` tokens from the caller.
-     *
-     * See {ERC20-_burn}.
-     */
-    function burn(uint256 _amount) external {
-        _burn(msg.sender, _amount);
+    function _mint(address account, uint256 amount) internal virtual override(ERC20, ERC20Votes) {
+        ERC20Votes._mint(account, amount);
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal whenNotPaused override {
-        super._beforeTokenTransfer(from, to, amount);
+    function _burn(address account, uint256 amount) internal virtual override(ERC20, ERC20Votes) {
+        ERC20Votes._burn(account, amount);
     }
 
     // Derives from multiple bases defining _afterTokenTransfer(), so the function overrides it
     function _afterTokenTransfer(address from, address to, uint256 amount) internal override(ERC20, ERC20Votes) {
-        super._afterTokenTransfer(from, to, amount);
+        ERC20Votes._afterTokenTransfer(from, to, amount);
     }
-
-    // Derives from multiple bases defining _mint(), so the function overrides it
-    function _mint(address to, uint256 amount) internal override(ERC20, ERC20Capped, ERC20Votes) {
-        super._mint(to, amount);
-    }
-
-    // Derives from multiple bases defining _burn(), so the function overrides it
-    function _burn(address account, uint256 amount) internal override(ERC20, ERC20Votes) {
-        super._burn(account, amount);
-    }
-
 }
