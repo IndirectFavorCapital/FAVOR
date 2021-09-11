@@ -1,5 +1,5 @@
-# BEP20 Favor
-BEP20 Favor contracts
+# ERC20 Favor
+ERC20 Favor contracts
 
 ## For Developers
 
