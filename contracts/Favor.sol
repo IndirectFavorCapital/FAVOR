@@ -13,15 +13,15 @@ contract FavorToken is ERC20Burnable, ERC20Votes, Ownable, Pausable, ReentrancyG
 
     using SafeERC20 for IERC20;
 
-    uint256 private immutable _cap;
+    uint256 public immutable cap;
 
     /**
      * @dev Initializes the contract minting the new tokens for the deployer.
      * deployer here is the owner of the FavorToken.
      */
-    constructor(string memory _name, string memory _symbol, uint256 _totalSupply, uint256 cap_) ERC20(_name, _symbol) ERC20Permit(_name) {
-        require(_totalSupply <= cap_,"constructor: totalSupply cannot be more than cap");
-        _cap = cap_;
+    constructor(string memory _name, string memory _symbol, uint256 _totalSupply, uint256 _cap) ERC20(_name, _symbol) ERC20Permit(_name) {
+        require(_totalSupply <= _cap,"constructor: totalSupply cannot be more than cap");
+        cap = _cap;
         _mint(msg.sender, _totalSupply);
     }
 
