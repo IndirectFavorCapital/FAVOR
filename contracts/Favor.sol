@@ -44,7 +44,7 @@ contract FavorToken is ERC20Burnable, ERC20Votes, Ownable, Pausable, ReentrancyG
     }
 
     /**
-     * @dev Creates `_amount` new tokens. Only the owner can call mint().
+     * @dev Creates `amount` new tokens. Only the owner can call mint().
      *
      * See {ERC20-_mint}.
      */
