@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 // smart contracts
-const FavorToken = artifacts.require("FavorToken");
+const Favor = artifacts.require("Favor");
 
 // test reward token params
 const FavorName = "Favor";
@@ -14,22 +14,22 @@ const FavorCap = ether("100000000");  // 100,000,000 tokens
 module.exports = async function (deployer, network, accounts) {
     if (network === "test") return; // skip migrations if use test network
 
-    // FavorToken deployment
-    console.log("FavorToken deployment...");
+    // Favor deployment
+    console.log("Favor deployment...");
 
     // deploy token
-    await deployer.deploy(FavorToken, FavorName, FavorSymbol, FavorSupply, FavorCap);
-    let favorToken = await FavorToken.deployed();
-    console.log("favorToken address: ", favorToken.address);
+    await deployer.deploy(Favor, FavorName, FavorSymbol, FavorSupply, FavorCap);
+    let Favor = await Favor.deployed();
+    console.log("Favor address: ", Favor.address);
 
     // write addresses and ABI to files
     console.log("write addresses and ABI to files");
     const contractsAddresses = {
-        favorToken: favorToken.address
+        Favor: Favor.address
     };
 
     const contractsAbi = {
-        favorToken: favorToken.abi
+        Favor: Favor.abi
     };
 
     const deployDirectory = `${__dirname}/../deployed`;
