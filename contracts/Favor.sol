@@ -22,7 +22,8 @@ contract Favor is ERC20, ERC20Capped, ERC20Burnable, ERC20Permit, ERC20Votes, Ow
      * deployer here is the owner of the Favor.
      */
     constructor(string memory _name, string memory _symbol, uint256 _totalSupply, uint256 _cap) ERC20(_name, _symbol) ERC20Capped(_cap) ERC20Permit(_name) {
-        _mint(msg.sender, _totalSupply);
+        require(_totalSupply <= _cap, "constructor: totalSupply cannot be more than cap");
+		ERC20._mint(msg.sender, _totalSupply);
     }
 
     /**
