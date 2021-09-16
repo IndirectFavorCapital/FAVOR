@@ -7,12 +7,13 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 
-contract Favor is ERC20, ERC20Capped, ERC20Burnable, ERC20Votes, Ownable, Pausable, ReentrancyGuard {
+contract Favor is ERC20, ERC20Capped, ERC20Burnable, ERC20Permit, ERC20Votes, Ownable, Pausable, ReentrancyGuard {
 
     using SafeERC20 for IERC20;
 
@@ -20,7 +21,7 @@ contract Favor is ERC20, ERC20Capped, ERC20Burnable, ERC20Votes, Ownable, Pausab
      * @dev Initializes the contract minting the new tokens for the deployer.
      * deployer here is the owner of the Favor.
      */
-    constructor(string memory _name, string memory _symbol, uint256 _totalSupply, uint256 _cap) ERC20(_name, _symbol) ERC20Capped(_cap) {
+    constructor(string memory _name, string memory _symbol, uint256 _totalSupply, uint256 _cap) ERC20(_name, _symbol) ERC20Capped(_cap) ERC20Permit(_name) {
         _mint(msg.sender, _totalSupply);
     }
 
@@ -49,15 +50,6 @@ contract Favor is ERC20, ERC20Capped, ERC20Burnable, ERC20Votes, Ownable, Pausab
      */
     function mint(uint256 _amount) external onlyOwner {
         _mint(msg.sender, _amount);
-    }
-
-    /**
-     * @dev Destroys `_amount` tokens from the caller.
-     *
-     * See {ERC20-_burn}.
-     */
-    function burn(uint256 _amount) external {
-        _burn(msg.sender, _amount);
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal whenNotPaused override {
