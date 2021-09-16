@@ -19,17 +19,17 @@ module.exports = async function (deployer, network, accounts) {
 
     // deploy token
     await deployer.deploy(Favor, FavorName, FavorSymbol, FavorSupply, FavorCap);
-    let Favor = await Favor.deployed();
-    console.log("Favor address: ", Favor.address);
+    let favor = await Favor.deployed();
+    console.log("Favor address: ", favor.address);
 
     // write addresses and ABI to files
     console.log("write addresses and ABI to files");
     const contractsAddresses = {
-        Favor: Favor.address
+        favor: favor.address
     };
 
     const contractsAbi = {
-        Favor: Favor.abi
+        favor: favor.abi
     };
 
     const deployDirectory = `${__dirname}/../deployed`;
