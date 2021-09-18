@@ -53,6 +53,7 @@ contract Favor is ERC20, ERC20Capped, ERC20Burnable, ERC20Permit, ERC20Votes, Ow
         _mint(msg.sender, _amount);
     }
 
+	// No tokens will be transferred if smart contract paused
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal whenNotPaused override {
         super._beforeTokenTransfer(from, to, amount);
     }
