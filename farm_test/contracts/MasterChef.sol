@@ -259,12 +259,12 @@ contract MasterChef is Ownable {
         }
         if(_amount > 0) {
             user.amount = user.amount.sub(_amount);
+            pancakeswapFarm.withdraw(pool.pancakeswapPid, _amount);
             pool.lpToken.safeTransfer(address(msg.sender), _amount);
         }
         user.rewardDebt = user.amount.mul(pool.accFavorPerShare).div(1e12);
         emit Withdraw(msg.sender, _pid, _amount);
 
-        pancakeswapFarm.withdraw(pool.pancakeswapPid, _amount);
     }
 
     // Stake Favor tokens to MasterChef
