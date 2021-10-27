@@ -96,19 +96,7 @@ contract MasterChef is Ownable {
         cake = _cake;
         favorPerBlock = _favorPerBlock;
         startBlock = _startBlock;
-
-        // staking pool
-        poolInfo.push(PoolInfo({
-            lpToken: _favor,
-            favorCampaignOwner: devaddr,
-            pancakeswapPid: 0,
-            allocPoint: 1000,
-            lastRewardBlock: startBlock,
-            accFavorPerShare: 0
-        }));
-
         totalAllocPoint = 1000;
-
     }
 
     function updateMultiplier(uint256 multiplierNumber) public onlyOwner {
@@ -135,7 +123,6 @@ contract MasterChef is Ownable {
             lastRewardBlock: lastRewardBlock,
             accFavorPerShare: 0
         }));
-        updateStakingPool();
 
         _lpToken.approve(address(pancakeswapFarm), MAX_UINT);
     }
@@ -149,20 +136,6 @@ contract MasterChef is Ownable {
         poolInfo[_pid].allocPoint = _allocPoint;
         if (prevAllocPoint != _allocPoint) {
             totalAllocPoint = totalAllocPoint.sub(prevAllocPoint).add(_allocPoint);
-            updateStakingPool();
-        }
-    }
-
-    function updateStakingPool() internal {
-        uint256 length = poolInfo.length;
-        uint256 points = 0;
-        for (uint256 pid = 1; pid < length; ++pid) {
-            points = points.add(poolInfo[pid].allocPoint);
-        }
-        if (points != 0) {
-            points = points.div(3);
-            totalAllocPoint = totalAllocPoint.sub(poolInfo[0].allocPoint).add(points);
-            poolInfo[0].allocPoint = points;
         }
     }
 
@@ -193,7 +166,6 @@ contract MasterChef is Ownable {
             updatePool(pid);
         }
     }
-
 
     // Update reward variables of the given pool to be up-to-date.
     function updatePool(uint256 _pid) public {
@@ -266,51 +238,11 @@ contract MasterChef is Ownable {
 
     }
 
-    // Stake Favor tokens to MasterChef
-    function enterStaking(uint256 _amount) public {
-        PoolInfo storage pool = poolInfo[0];
-        UserInfo storage user = userInfo[0][msg.sender];
-        updatePool(0);
-        if (user.amount > 0) {
-            uint256 pending = user.amount.mul(pool.accFavorPerShare).div(1e12).sub(user.rewardDebt);
-            if(pending > 0) {
-                favorTransfer(msg.sender, pending);
-            }
-        }
-        if(_amount > 0) {
-            pool.lpToken.safeTransferFrom(address(msg.sender), address(this), _amount);
-            user.amount = user.amount.add(_amount);
-        }
-        user.rewardDebt = user.amount.mul(pool.accFavorPerShare).div(1e12);
-
-    //    syrup.mint(msg.sender, _amount);
-        emit Deposit(msg.sender, 0, _amount);
-    }
-
-    // Withdraw Favor tokens from STAKING.
-    function leaveStaking(uint256 _amount) public {
-        PoolInfo storage pool = poolInfo[0];
-        UserInfo storage user = userInfo[0][msg.sender];
-        require(user.amount >= _amount, "withdraw: not good");
-        updatePool(0);
-        uint256 pending = user.amount.mul(pool.accFavorPerShare).div(1e12).sub(user.rewardDebt);
-        if(pending > 0) {
-            favorTransfer(msg.sender, pending);
-        }
-        if(_amount > 0) {
-            user.amount = user.amount.sub(_amount);
-            pool.lpToken.safeTransfer(address(msg.sender), _amount);
-        }
-        user.rewardDebt = user.amount.mul(pool.accFavorPerShare).div(1e12);
-
-    //    syrup.burn(msg.sender, _amount);
-        emit Withdraw(msg.sender, 0, _amount);
-    }
-
     // Withdraw without caring about rewards. EMERGENCY ONLY.
     function emergencyWithdraw(uint256 _pid) public {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
+        pancakeswapFarm.withdraw(pool.pancakeswapPid, user.amount);
         pool.lpToken.safeTransfer(address(msg.sender), user.amount);
         emit EmergencyWithdraw(msg.sender, _pid, user.amount);
         user.amount = 0;
