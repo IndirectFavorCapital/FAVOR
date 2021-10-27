@@ -1,10 +1,9 @@
 pragma solidity 0.8.6;
 
-
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-
-import "./Favor.sol";
-
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 // import "@nomiclabs/buidler/console.sol";
 
@@ -55,7 +54,7 @@ contract MasterChef is Ownable {
     }
 
     // The Favor TOKEN!
-    Favor public favor;
+    IERC20 public favor;
     // The SYRUP TOKEN!
     //SyrupBar public syrup;
     // Dev address.
@@ -82,7 +81,7 @@ contract MasterChef is Ownable {
     event EmergencyWithdraw(address indexed user, uint256 indexed pid, uint256 amount);
 
     constructor(
-        Favor _favor,
+        IERC20 _favor,
     //    SyrupBar _syrup,
     //    address _devaddr,
         IFarm _pancakeswapFarm,
@@ -226,9 +225,9 @@ contract MasterChef is Ownable {
         if (user.amount > 0) {
             uint256 pending = user.amount.mul(pool.accFavorPerShare).div(1e12).sub(user.rewardDebt);
             if(pending > 0) {
-                uint256 half = pending / 2;
-                safeFavorTransfer(msg.sender, half);
-                safeFavorTransfer(pool.favorCampaignOwner, pending - half);
+                uint256 half = pending.div(2);
+                favorTransfer(msg.sender, half);
+                favorTransfer(pool.favorCampaignOwner, pending - half);
             }
         }
         if (_amount > 0) {
@@ -252,9 +251,9 @@ contract MasterChef is Ownable {
         updatePool(_pid);
         uint256 pending = user.amount.mul(pool.accFavorPerShare).div(1e12).sub(user.rewardDebt);
         if(pending > 0) {
-            uint256 half = pending / 2;
-            safeFavorTransfer(msg.sender, half);
-            safeFavorTransfer(pool.favorCampaignOwner, pending - half);
+            uint256 half = pending.div(2);
+            favorTransfer(msg.sender, half);
+            favorTransfer(pool.favorCampaignOwner, pending - half);
             
         }
         if(_amount > 0) {
@@ -275,7 +274,7 @@ contract MasterChef is Ownable {
         if (user.amount > 0) {
             uint256 pending = user.amount.mul(pool.accFavorPerShare).div(1e12).sub(user.rewardDebt);
             if(pending > 0) {
-                safeFavorTransfer(msg.sender, pending);
+                favorTransfer(msg.sender, pending);
             }
         }
         if(_amount > 0) {
@@ -296,7 +295,7 @@ contract MasterChef is Ownable {
         updatePool(0);
         uint256 pending = user.amount.mul(pool.accFavorPerShare).div(1e12).sub(user.rewardDebt);
         if(pending > 0) {
-            safeFavorTransfer(msg.sender, pending);
+            favorTransfer(msg.sender, pending);
         }
         if(_amount > 0) {
             user.amount = user.amount.sub(_amount);
@@ -318,14 +317,11 @@ contract MasterChef is Ownable {
         user.rewardDebt = 0;
     }
 
-    // Safe favor transfer function, just in case if rounding error causes pool to not have enough Favors.
-    function safeFavorTransfer(address _to, uint256 _amount) internal {
+    // Favor transfer function
+    function favorTransfer(address _to, uint256 _amount) internal {
         uint256 favorBal = favor.balanceOf(address(this));
-        if (_amount > favorBal) {
-            favor.transfer(_to, favorBal);
-        } else {
-            favor.transfer(_to, _amount);
-        }
+        require(favorBal >= _amount, "not enough favor in smart contract");
+        favor.transfer(_to, _amount);
     }
 
     // Update dev address by the previous dev.
