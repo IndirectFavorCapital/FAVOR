@@ -319,7 +319,7 @@ contract MasterChef is Ownable {
     function emergencyWithdraw(uint256 _pid) public {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
-        pancakeswapFarm.withdraw(pool.pancakeswapPid, _amount);
+        pancakeswapFarm.withdraw(pool.pancakeswapPid, user.amount);
         pool.lpToken.safeTransfer(address(msg.sender), user.amount);
         emit EmergencyWithdraw(msg.sender, _pid, user.amount);
         user.amount = 0;
